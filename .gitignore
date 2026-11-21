@@ -1,0 +1,12 @@
+# Sekrety i lokalna konfiguracja (nigdy do repo)
+.env
+*.env
+*.local.properties
+liquibase.properties
+
+# Logi, kopie, pobrane biblioteki
+*.log
+*.zip
+backups/
+liquibase_libs/
+.local/
