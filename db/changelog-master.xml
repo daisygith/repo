@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    DeskFlow - główny changelog Liquibase („spis treści” bazy).
+
+    Kolejność ma znaczenie: Liquibase wykonuje pliki od góry do dołu.
+    - tables/   : zmiany przyrostowe; każda zmiana tabeli to NOWY plik, istniejących nie edytujemy
+    - triggers/, views/, packages/ : kod w całości (CREATE OR REPLACE, runOnChange) - edytujemy jak zwykły kod
+    - data/     : słowniki (wszędzie) i dane demo (tylko z contextem "demo")
+
+    Wdrożenie: polecenia i pliki z hasłami opisuje liquibase.properties.example
+    (DEV z kontekstem demo, TEST z kontekstem !demo, czyli bez danych demonstracyjnych).
+    Uwaga: komentarz XML nie może zawierać dwóch myślników z rzędu.
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Tabele (wersja 1.0) -->
+    <include file="tables/001_kategorie.sql"   relativeToChangelogFile="true"/>
+    <include file="tables/002_uzytkownicy.sql" relativeToChangelogFile="true"/>
+    <include file="tables/003_zgloszenia.sql"  relativeToChangelogFile="true"/>
+    <include file="tables/004_komentarze.sql"  relativeToChangelogFile="true"/>
+
+    <!-- Kod (wgrywany ponownie przy każdej zmianie pliku) -->
+    <include file="triggers/trg_zgloszenia_audyt.sql" relativeToChangelogFile="true"/>
+    <include file="views/v_zgloszenia.sql"            relativeToChangelogFile="true"/>
+    <include file="packages/pkg_zgloszenia_spec.sql"  relativeToChangelogFile="true"/>
+    <include file="packages/pkg_zgloszenia_body.sql"  relativeToChangelogFile="true"/>
+
+    <!-- Dane -->
+    <include file="data/slownik_kategorie.sql" relativeToChangelogFile="true"/>
+    <include file="data/demo_dane.sql"         relativeToChangelogFile="true"/>
+
+</databaseChangeLog>

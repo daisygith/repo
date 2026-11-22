@@ -1,0 +1,19 @@
+# Wzór konfiguracji połączenia Liquibase - BEZ HASŁA.
+#
+# Skopiuj ten plik poza repozytorium, np. do:
+#   C:\deskflow\secrets\dev.liquibase.properties   (username=DESK_A_DEV)
+#   C:\deskflow\secrets\test.liquibase.properties  (username=DESK_A_TEST)
+# i wpisz tam prawdziwe hasło. Plików z hasłami nigdy nie dodawaj do Gita.
+#
+# Użycie (z katalogu repozytorium):
+#   DEV : liquibase --defaults-file=C:\deskflow\secrets\dev.liquibase.properties  update --contexts=demo
+#   TEST: liquibase --defaults-file=C:\deskflow\secrets\test.liquibase.properties update --contexts=!demo
+#
+# UWAGA: bez --contexts Liquibase wykona WSZYSTKIE changesety, także dane demo.
+# Na TEST zawsze podawaj --contexts=!demo.
+
+searchPath=C:/deskflow/repo
+changelogFile=db/changelog-master.xml
+url=jdbc:oracle:thin:@//localhost:1521/deskflow
+username=DESK_A_DEV
+password=WPISZ_HASLO_TYLKO_W_KOPII_POZA_REPO
