@@ -15,6 +15,8 @@ Projekt porównuje trzy podejścia: **Liquibase**, **SQLcl Projects** (narzędzi
 | [02-problemy-i-rozwiazania.md](02-problemy-i-rozwiazania.md) | Problemy napotkane po drodze i sposób ich rozwiązania |
 | [03-slownik.md](03-slownik.md) | Krótkie wyjaśnienia pojęć (CDB/PDB, SYS/SYSTEM, SQLcl, ORDS, Liquibase…) |
 | [04-wdrozenie-w-istniejacym-srodowisku.md](04-wdrozenie-w-istniejacym-srodowisku.md) | Jak wprowadzić wersjonowanie, gdy DEV/TEST/PROD już istnieją: porównanie, baseline, synchronizacja, kolejność wdrażania w zespole |
+| [05-przygotowanie-do-prezentacji.md](05-przygotowanie-do-prezentacji.md) | Ściąga, przebieg prezentacji dla przełożonego, pytania z odpowiedziami, pojęcia prostymi słowami |
+| [06-lekcje.md](06-lekcje.md) | Lekcje krok po kroku: wyjaśnienia, pytania kontrolne, moje odpowiedzi i odpowiedzi wzorcowe |
 
 ## Status
 
@@ -22,8 +24,10 @@ Projekt porównuje trzy podejścia: **Liquibase**, **SQLcl Projects** (narzędzi
 |---|---|
 | Plan i kryteria oceny | ✅ ustalone |
 | Środowisko: narzędzia (SQLcl, ORDS, Java) | ✅ gotowe |
-| Środowisko: baza (PDB `DESKFLOW`), APEX 24.2.0, ORDS 26.3.1, workspace'y DEV/TEST, połączenia SQL Developera, Git for Windows 2.56.1 | ✅ gotowe |
-| Środowisko: Liquibase 5.0.4 (`Path`, sterownik Oracle), inicjalizacja repozytorium | 🔄 w trakcie |
+| Środowisko: baza (PDB `DESKFLOW`), APEX 24.2.0, ORDS 26.3.1, workspace'y DEV/TEST, połączenia SQL Developera, Git for Windows 2.56.1, repozytorium (pierwszy commit), Liquibase 5.0.4 ze sterownikiem Oracle | ✅ gotowe |
+| Zapisane połączenie SQLcl dla DEV (`DESKFLOW_A_DEV`) | ✅ gotowe |
+| Model v1.0 wdrożony na DEV przez Liquibase (11 changesetów, obiekty VALID, reguły pakietu 12/12) | ✅ gotowe |
+| Commit i PR gałęzi `feature/model-v1.0`, wdrożenie na TEST (`--contexts=!demo`) | 🔄 w trakcie |
 | Aplikacja DeskFlow (DEV) | ⏳ później |
 | Wersjonowanie i scenariusze testowe | ⏳ później |
 | Raport porównawczy i rekomendacja | ⏳ później |

@@ -389,7 +389,7 @@ Uzyskane: `DESK_A_DEV` / `DESKFLOW` oraz `DESK_A_TEST` / `DESKFLOW`.
 
 > **Baza, APEX, ORDS i workspace'y są gotowe.** Dalej: narzędzia do wersjonowania.
 
-## Krok 11: Git for Windows ✅ (inicjalizacja repo: ⏳)
+## Krok 11: Git for Windows i repozytorium ✅
 
 SQLcl Projects i Liquibase wywołują polecenie `git`, więc Git musi być w `Path`. Git dołączony do GitHub Desktop się do tego nie nadaje. Leży w katalogu zależnym od wersji aplikacji (`...\GitHubDesktop\app-<wersja>\...`), który zmienia się przy każdej aktualizacji GitHub Desktop, więc wpis w `Path` przestałby działać.
 
@@ -412,15 +412,38 @@ SQLcl Projects i Liquibase wywołują polecenie `git`, więc Git musi być w `Pa
 
 Repozytorium obejmuje tylko `C:\deskflow\repo`. Pozostałe katalogi (`tools`, `config`, `secrets`, `logs`, `backups`) zostają lokalnie.
 
-**Punkt kontrolny:** `git --version` działa w nowym terminalu, a `C:\deskflow\repo` jest repozytorium Git na gałęzi `main`.
+Wykonane: ✅ `git init -b main` w `C:\deskflow\repo`. Do repozytorium dodano:
 
-## Krok 12: Liquibase Community 🔄 w trakcie
+- **`.gitignore`**:
+  ```
+  .env
+  *.env
+  *.local.properties
+  liquibase.properties
+  *.log
+  *.zip
+  backups/
+  liquibase_libs/
+  .local/
+  ```
+  `liquibase.properties` dodaliśmy względem pierwotnej instrukcji, bo zwykle zawiera hasło. Do repozytorium trafi później wzór tego pliku bez haseł.
+- **`README.md`** w katalogu głównym: krótki opis projektu i link do `docs/README.md`.
+
+Przed pierwszym commitem `git status` pokazał tylko `.gitignore`, `README.md` i `docs/`, a dokumentacja została sprawdzona pod kątem haseł i danych osobowych. Pliki dodano **po nazwach** (`git add .gitignore README.md docs`), a nie przez `git add .`, żeby nic nieprzejrzanego nie trafiło do repozytorium.
+
+Pierwszy commit: `5d2fac9` „Dokumentacja środowiska i szkielet repozytorium”, 8 plików, gałąź `main`, na razie tylko lokalnie (bez GitHuba).
+
+Przy `git add` pojawiły się ostrzeżenia `LF will be replaced by CRLF`. Są nieszkodliwe: Git for Windows ma domyślnie `core.autocrlf=true`, a część plików ma końce linii LF. Ujednolicenie planujemy przez `.gitattributes` (zob. „Dalsze kroki”).
+
+**Punkt kontrolny:** ✅ `git --version` działa w nowym terminalu, a `C:\deskflow\repo` jest repozytorium Git na gałęzi `main` z pierwszym commitem.
+
+## Krok 12: Liquibase Community ✅
 
 | Część | Stan |
 |---|---|
 | ZIP rozpakowany, `liquibase.bat --version` działa | ✅ |
 | Polecenie `liquibase` z `Path` | ✅ po poprawieniu nazwy folderu (problem 10) |
-| Sterownik Oracle (`lpm add`) | 🔄 w trakcie |
+| Sterownik Oracle | ✅ ręcznie skopiowany `ojdbc11.jar`, bo LPM nie działa (problem 11) |
 
 1. Pobrać Liquibase Community (ZIP) i rozpakować do `C:\deskflow\tools\liquibase`. Uwaga na pisownię: **liqui*b*ase**, nie „liquid” (zob. [02-problemy-i-rozwiazania.md](02-problemy-i-rozwiazania.md), problem 10).
 
@@ -434,15 +457,43 @@ Repozytorium obejmuje tylko `C:\deskflow\repo`. Pozostałe katalogi (`tools`, `c
    Get-Command liquibase
    ```
    Uzyskane: ✅ `Get-Command` → `C:\deskflow\tools\liquibase\liquibase.bat`. `liquibase --version` → 5.0.4, Liquibase Home `C:\deskflow\tools\liquibase`, Java Home JDK 21.0.9. W tej paczce `liquibase.bat` leży w katalogu głównym, więc do `Path` trafia sam `C:\deskflow\tools\liquibase`.
-4. Dodać sterownik Oracle w katalogu repozytorium:
+4. Dodać sterownik Oracle.
+
+   **Zamierzony sposób (LPM)** nie zadziałał:
    ```powershell
    Set-Location C:\deskflow\repo
    liquibase lpm add liquibase-oracle
    ```
-   Manifest zależności zostaje w repozytorium. Pobrane biblioteki (`liquibase_libs/`) nie są publikowane.
+   Już `liquibase lpm search oracle` kończy się błędem certyfikatu przy pobieraniu LPM z GitHuba (`PKIX path building failed`). Szczegóły: [02-problemy-i-rozwiazania.md](02-problemy-i-rozwiazania.md), problem 11.
 
-**Punkt kontrolny:** `liquibase --version` podaje wersję, a zależność Oracle jest pobrana. Sam wynik `--version` nie dowodzi poprawnego połączenia z bazą. To potwierdzi dopiero pierwszy changelog.
+   **Zastosowany plan awaryjny** (przewidziany w pierwotnej instrukcji): pojedynczy sterownik JDBC skopiowany z SQLcl:
+   ```powershell
+   Copy-Item C:\deskflow\tools\sqlcl\lib\ojdbc11.jar C:\deskflow\tools\liquibase\lib\
+   ```
+   Sterownik 23.x obsługuje bazy 19c i 21c. Przy aktualizacji SQLcl warto skopiować go ponownie, żeby wersje się nie rozjechały.
+
+**Punkt kontrolny:** ✅ `liquibase --version` w sekcji *Libraries* pokazuje `lib\ojdbc11.jar: JDBC 23.26.2.0.0 By Oracle Corporation`. Sam wynik `--version` nie dowodzi poprawnego połączenia z bazą. To potwierdzi dopiero pierwszy changelog.
+
+## Krok 13: Zapisane połączenie SQLcl dla DEV 🔄 w trakcie
+
+Żeby nie wpisywać hasła przy każdym uruchomieniu (i żeby asystent mógł łączyć się z DEV **bez znajomości hasła**), połączenie zapisujemy w SQLcl:
+
+```sql
+connect -save DESKFLOW_A_DEV -savepwd DESK_A_DEV@//localhost:1521/deskflow
+```
+Hasło wpisuje się tylko w monicie. Później połączenie otwiera:
+```powershell
+sqlcl -name DESKFLOW_A_DEV
+```
+
+Następnie: projekt tabel aplikacji DeskFlow.
 
 ## Dalsze kroki ⏳
+
+- **Plik `.gitattributes` ujednolicający końce linii** (🔄 dodany na gałęzi `feature/model-v1.0`, jeszcze bez commita):
+  ```
+  * text=auto eol=lf
+  ```
+  To ważne dla plików SQL i changelogów. Liquibase liczy **sumę kontrolną** każdego changesetu. Jeśli ten sam plik na jednym komputerze ma końce linii CRLF, a na innym LF, suma może wyjść inna i Liquibase zgłosi, że „zmieniono już wykonany changeset”. Do tego diffy w Gicie pokazywałyby zmiany w całym pliku, choć zmienił się tylko znak końca linii. Jeden ustalony format daje spójne sumy i czyste diffy niezależnie od systemu.
 
 - Codzienny start i zatrzymanie (usługa XE startuje sama; ORDS uruchamiany ręcznie).

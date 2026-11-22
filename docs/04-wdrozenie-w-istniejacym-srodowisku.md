@@ -171,4 +171,8 @@ Sekcja uzupełniana po kolejnych etapach projektu (Liquibase, SQLcl Projects, sc
 
 | Etap | Wniosek | Status |
 |---|---|---|
-| — | jeszcze brak wyników | 🔬 |
+| Instalacja Liquibase | W firmowej sieci z inspekcją TLS (proxy, antywirus) pobieranie przez Liquibase LPM i inne narzędzia Javowe skończy się błędem `PKIX path building failed`, bo Java ma własny magazyn certyfikatów. Trzeba zaplanować **lokalne repozytorium artefaktów** (np. firmowy mirror) albo **dołączanie sterownika JDBC ręcznie** (np. `ojdbc11.jar` z SQLcl), uzgodnione z działem bezpieczeństwa. W PoC zadziałało ręczne dołączenie sterownika. | ✅ |
+| Repozytorium | Przy dodawaniu istniejącego kodu do repo dodawać pliki po nazwach (nie `git add .`), mieć `.gitignore` z `liquibase.properties` i plikami z hasłami, oraz od razu ustalić końce linii (`.gitattributes`), żeby sumy kontrolne Liquibase były takie same na komputerach wszystkich programistów. | 🔬 |
+| Model v1.0 | Pakiety w plikach `.pks`/`.pkb`, typowe w firmach, nie są rozpoznawane przez Liquibase jako formatted SQL. Trzeba zmienić nazwy na `.sql` albo dołączać je przez `<sqlFile>` (do sprawdzenia). Ograniczenia z nazwami systemowymi `SYS_Cnnnn` na istniejących bazach dadzą fałszywe różnice przy porównaniach, więc przy inwentaryzacji warto zaplanować nadanie im jawnych nazw. | ✅ rozszerzenia / 🔬 `<sqlFile>` |
+| Konteksty | Dane demo i testowe oznaczać kontekstem i na TEST/PROD zawsze wykluczać (`--contexts=!demo`), najlepiej na stałe w pliku właściwości środowiska. | ✅ |
+| Wdrożenie v1.0 na DEV | Przed każdym wdrożeniem uruchamiać `liquibase status` (niczego nie zmienia, pokazuje, co pójdzie). Po wdrożeniu kodu PL/SQL zawsze sprawdzać `user_objects` i `user_errors`, bo Liquibase nie zgłasza pakietów skompilowanych z błędami. Na istniejących bazach z wieloma pakietami to szczególnie ważne. | ✅ |
